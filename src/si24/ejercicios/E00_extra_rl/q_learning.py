@@ -1,6 +1,7 @@
 import gymnasium as gym
 import numpy as np
 
+
 class RandomAgent:
     def __init__(self, env, alpha=0.1, gamma=0.9, epsilon=0.1):
         self.env = env
@@ -20,40 +21,49 @@ class RandomAgent:
         return self.action_space.sample()
 
     def step(self, state, action, reward, next_state):
-        pass
+        return
 
 
 class QLearningAgent(RandomAgent):
-    def __init__(self, env, alpha=0.1, gamma=0.9, epsilon=0.1):
-        super().__init__(env, alpha, gamma, epsilon)
+    def __init__(self, env, q_table_file=None):
+        super().__init__(env)
+        self.Q = np.load(q_table_file)
 
     def act(self, observation):
-        if np.random.random() < self.epsilon:
-            return env.action_space.sample()  # Exploration
-        else:
-            return np.argmax(self.Q[observation])  # Exploitation
+        return np.argmax(self.Q[observation])
 
     # Update Q values using Q-learning
     def step(self, state, action, reward, next_state):
-        best_next_action = np.argmax(self.Q[next_state])
-        # TODO: Implementa la actualización de Q-learning usando la ecuación vista en clase
-        #Creo q ya esta no estoy seguro
-        self.Q[state][action] = self.Q[state][action] + self.alpha * (reward + self.gamma * max(self.Q[next_state]) - self.Q[state][action])
-
+        pass
+        # best_next_action = np.argmax(self.Q[next_state])
+        # Actualización de Q-learning
+        # self.Q[state][action] = self.Q[state][action] + self.alpha * (reward + self.gamma * max(self.Q[next_state]) - self.Q[state][action])
 
 if __name__ == "__main__":
-    # TODO:
-    # Este ejercicio cuenta como 5 pts extra en el primer examen parcial
-    # 1. completa el código para implementar q learning,
-    # 2. modifica los hiperparámetros para que el agente aprenda
-    # 3. ejecuta el script para ver el comportamiento del agente
-    # 4. Implementa una técnica para reducir la exploración conforme el agente aprende
-    # https://gymnasium.farama.org/environments/toy_text/cliff_walking/
-    env = gym.make("CliffWalking-v0", render_mode="human")
 
-    n_episodes = 1000
+    env = gym.make("CliffWalking-v0", render_mode="human")
+    q_table_file = 'q_table_episode_1000.npy'
+    agent = QLearningAgent(env, q_table_file)
+
+    obs, _ = env.reset()
+    done = False
+    while not done:
+        action = agent.act(obs)
+        step_result = env.step(action)
+        next_obs = step_result[0]
+        reward = step_result[1]
+        done = step_result[2]
+        env.render()
+        obs = next_obs
+
+    env.close()
+
+
+
+    """
+    n_episodes = 1001
     episode_length = 200
-    agent = QLearningAgent(env, alpha=0.1, gamma=0.9, epsilon=0.9)
+    agent = QLearningAgent(env, alpha=0.5, gamma=0.9, epsilon=1)
     for e in range(n_episodes):
         obs, _ = env.reset()
         ep_return = 0
@@ -70,9 +80,12 @@ if __name__ == "__main__":
             obs = next_obs
             print(agent.Q)
             env.render()
-        # TODO: Implementa algun código para reducir la exploración del agente conforme aprende
-        # puedes decidir hacerlo por episodio, por paso del tiempo, retorno promedio, etc.
-
-
+            #agent.epsilon -= 0.000005   
+            agent.epsilon *= 0.999995 
+            print(agent.epsilon) 
         print(f"Episode {e} return: ", ep_return)
+        # Se guarda la Q-table cada 100 episodios
+        if (e) % 100 == 0:
+            np.save(f'q_table_episode_{e}.npy', agent.Q)
     env.close()
+    """
