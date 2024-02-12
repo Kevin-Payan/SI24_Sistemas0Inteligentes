@@ -38,29 +38,15 @@ class QLearningAgent(RandomAgent):
         # best_next_action = np.argmax(self.Q[next_state])
         # Actualización de Q-learning
         # self.Q[state][action] = self.Q[state][action] + self.alpha * (reward + self.gamma * max(self.Q[next_state]) - self.Q[state][action])
-
+ 
 if __name__ == "__main__":
 
     env = gym.make("CliffWalking-v0", render_mode="human")
-    q_table_file = 'q_table_episode_1000.npy'
-    agent = QLearningAgent(env, q_table_file)
-
-    obs, _ = env.reset()
-    done = False
-    while not done:
-        action = agent.act(obs)
-        step_result = env.step(action)
-        next_obs = step_result[0]
-        reward = step_result[1]
-        done = step_result[2]
-        env.render()
-        obs = next_obs
-
-    env.close()
+    
 
 
 
-    """
+    
     n_episodes = 1001
     episode_length = 200
     agent = QLearningAgent(env, alpha=0.5, gamma=0.9, epsilon=1)
@@ -88,4 +74,4 @@ if __name__ == "__main__":
         if (e) % 100 == 0:
             np.save(f'q_table_episode_{e}.npy', agent.Q)
     env.close()
-    """
+   
