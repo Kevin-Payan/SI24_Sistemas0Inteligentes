@@ -71,7 +71,7 @@ if __name__ == "__main__":
                 break
             ep_return += reward
             obs = next_obs
-            print(agent.Q) #Este lo comento a veces para hacer los tests rapidos
+            #print(agent.Q) #Este lo comento a veces para hacer los tests rapidos
             env.render()
             
         print(f"Se acabo el episodio numero: ", e)
