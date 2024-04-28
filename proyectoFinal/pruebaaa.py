@@ -1,4 +1,4 @@
-#### Import Libraries
+# Import Libraries
 import cv2
 import numpy as np
 import os 
@@ -6,7 +6,7 @@ import matplotlib as plt
 import time 
 import mediapipe as mp
 
-#### Model Detection + Drawing
+# Model Detection + Drawing
 
 mp_holistic = mp.solutions.holistic #Holistic Model
 mp_drawing = mp.solutions.drawing_utils #Drawing
@@ -46,6 +46,24 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
         frame = cv2.flip(frame,1)
         # Make detections
         frame, results = mediapipe_detection(frame, holistic)
+        # Extract Keypoints 
+        # Get results in one single array, if doesnt exist add 0s. 
+        left_hand_nparray = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
+        right_hand_nparray = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
+        """
+        #Analizar comportamiento
+        print('Left Hand np array')
+        print(len(left_hand_nparray))
+        print('-------------------')
+        print(left_hand_nparray)
+        print('-------------------')
+
+        print('Right Hand np array')
+        print(len(right_hand_nparray))
+        print('-------------------')
+        print(right_hand_nparray)
+        print('-------------------')
+        """
         # Draw landmarks
         draw_landmarks(frame, results)  
         # Show to screen
@@ -57,23 +75,3 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
     cap.release()
     cv2.destroyAllWindows()
 
-#### Extract Keypoints (Aqui los keypoints son lo ultimo que captura la camara creo, luego movere eso al while de arriba supongo)
-
-# Get results in one single array, if doesnt exist add 0s. 
-left_hand_nparray = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
-right_hand_nparray = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
-
-"""
-#Analizar comportamiento
-print('Left Hand np array')
-print(len(left_hand_nparray))
-print('-------------------')
-print(left_hand_nparray)
-print('-------------------')
-
-print('Right Hand np array')
-print(len(right_hand_nparray))
-print('-------------------')
-print(right_hand_nparray)
-print('-------------------')
-"""
