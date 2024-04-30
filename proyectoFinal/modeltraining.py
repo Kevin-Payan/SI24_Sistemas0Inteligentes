@@ -1,30 +1,41 @@
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
-# Create a Sequential model
-model = tf.keras.Sequential([
-    tf.keras.layers.Flatten(input_shape=(28, 28)),  # Input layer; assumes input data is 28x28
-    tf.keras.layers.Dense(128, activation='relu'),  # Hidden layer with 128 neurons
-    tf.keras.layers.Dropout(0.2),                   # Dropout layer for regularization
-    tf.keras.layers.Dense(10, activation='softmax') # Output layer with 10 classes (for classification)
-])
+# Define the path to the dataset
+dataset_path = 'C:/Users/kevin/Desktop/ASL_Dataset/asl_alphabet'
 
+# Training Split
+train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+    dataset_path,
+    validation_split=0.2,
+    subset="training",
+    seed=123,
+    batch_size=16 #32 truena en mi laptop xd
+)
 
+# Validation Split
+validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+    dataset_path,
+    validation_split=0.2,
+    subset="validation",
+    seed=123,
+    batch_size=16 
+)
 
-model.compile(optimizer='adam',
-              loss='sparse_categorical_crossentropy',
-              metrics=['accuracy'])
+# Configure the dataset for performance
+AUTOTUNE = tf.data.AUTOTUNE
+train_dataset = train_dataset.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
+validation_dataset = validation_dataset.cache().prefetch(buffer_size=AUTOTUNE)
 
+def show_batch(image_batch, label_batch):
+    plt.figure(figsize=(10, 10))
+    for n in range(5):  # Display 5 images
+        ax = plt.subplot(3, 3, n + 1)
+        plt.imshow(image_batch[n].numpy().astype("uint8"))
+        plt.title(label_batch[n])
+        plt.axis("off")
+    plt.show()
 
-
-# Assume x_train and y_train are your data and labels respectively
-model.fit(x_train, y_train, epochs=5)
-
-
-
-# Assume x_test and y_test are your test data and labels
-test_loss, test_acc = model.evaluate(x_test, y_test)
-print('\nTest accuracy:', test_acc)
-
-
-
-predictions = model.predict(x_test)
+# Extract a batch of images and labels from the training dataset
+for image_batch, label_batch in train_dataset.take(1):
+    show_batch(image_batch, label_batch)

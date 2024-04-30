@@ -51,6 +51,9 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
         left_hand_nparray = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
         right_hand_nparray = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
         """
+
+        #Normalizar a 200x200?
+
         #Analizar comportamiento
         print('Left Hand np array')
         print(len(left_hand_nparray))
