@@ -34,6 +34,58 @@ def draw_landmarks(image, results):
     mp_drawing.DrawingSpec(color=(255, 255, 0), thickness=2, circle_radius=2), #Circles
     mp_drawing.DrawingSpec(color=(255, 127, 0), thickness=2) #Lines
     ) 
+
+
+# Draw Hands with bounding box (Colors are in BGR format)
+def draw_landmarksB(image, results, padding=40):  # padding parameter with a default of 20 pixels
+    # Draw left hand
+    if results.left_hand_landmarks:
+        # Calculate the bounding box for the left hand with padding
+        x_min = min([lm.x for lm in results.left_hand_landmarks.landmark]) * image.shape[1] - padding
+        x_max = max([lm.x for lm in results.left_hand_landmarks.landmark]) * image.shape[1] + padding
+        y_min = min([lm.y for lm in results.left_hand_landmarks.landmark]) * image.shape[0] - padding
+        y_max = max([lm.y for lm in results.left_hand_landmarks.landmark]) * image.shape[0] + padding
+
+        # Ensure coordinates are within image boundaries
+        x_min = max(0, x_min)
+        x_max = min(image.shape[1], x_max)
+        y_min = max(0, y_min)
+        y_max = min(image.shape[0], y_max)
+
+        # Draw the rectangle with padding
+        cv2.rectangle(image, (int(x_min), int(y_min)), (int(x_max), int(y_max)), (0, 255, 0), 2)  # Green rectangle
+        
+        # Draw landmarks
+        mp_drawing.draw_landmarks(
+            image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
+            mp_drawing.DrawingSpec(color=(255, 0, 255), thickness=2, circle_radius=2),  # Circles
+            mp_drawing.DrawingSpec(color=(127, 0, 255), thickness=2)  # Lines
+        )
+    
+    # Draw right hand
+    if results.right_hand_landmarks:
+        # Calculate the bounding box for the right hand with padding
+        x_min = min([lm.x for lm in results.right_hand_landmarks.landmark]) * image.shape[1] - padding
+        x_max = max([lm.x for lm in results.right_hand_landmarks.landmark]) * image.shape[1] + padding
+        y_min = min([lm.y for lm in results.right_hand_landmarks.landmark]) * image.shape[0] - padding
+        y_max = max([lm.y for lm in results.right_hand_landmarks.landmark]) * image.shape[0] + padding
+
+        # Ensure coordinates are within image boundaries
+        x_min = max(0, x_min)
+        x_max = min(image.shape[1], x_max)
+        y_min = max(0, y_min)
+        y_max = min(image.shape[0], y_max)
+
+        # Draw the rectangle with padding
+        cv2.rectangle(image, (int(x_min), int(y_min)), (int(x_max), int(y_max)), (255, 0, 0), 2)  # Blue rectangle
+        
+        # Draw landmarks
+        mp_drawing.draw_landmarks(
+            image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
+            mp_drawing.DrawingSpec(color=(255, 255, 0), thickness=2, circle_radius=2),  # Circles
+            mp_drawing.DrawingSpec(color=(255, 127, 0), thickness=2)  # Lines
+        )
+
     
 cap = cv2.VideoCapture(0)
 # Set mediapipe model 
@@ -68,7 +120,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
         print('-------------------')
         """
         # Draw landmarks
-        draw_landmarks(frame, results)  
+        draw_landmarksB(frame, results)  
         # Show to screen
         cv2.putText(frame, "Press 'q' to end", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.imshow('OpenCV Feed', frame)

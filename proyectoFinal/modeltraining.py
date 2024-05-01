@@ -1,4 +1,6 @@
 import tensorflow as tf
+from tensorflow.python.keras import models, layers
+from tensorflow.python.keras.layers import Conv2D, MaxPooling2D, BatchNormalization, Flatten, Dense
 import matplotlib.pyplot as plt
 
 # Define the path to the dataset
@@ -22,20 +24,24 @@ validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
     batch_size=16 
 )
 
-# Configure the dataset for performance
-AUTOTUNE = tf.data.AUTOTUNE
-train_dataset = train_dataset.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
-validation_dataset = validation_dataset.cache().prefetch(buffer_size=AUTOTUNE)
 
-def show_batch(image_batch, label_batch):
-    plt.figure(figsize=(10, 10))
-    for n in range(5):  # Display 5 images
-        ax = plt.subplot(3, 3, n + 1)
-        plt.imshow(image_batch[n].numpy().astype("uint8"))
-        plt.title(label_batch[n])
-        plt.axis("off")
-    plt.show()
-
-# Extract a batch of images and labels from the training dataset
-for image_batch, label_batch in train_dataset.take(1):
-    show_batch(image_batch, label_batch)
+#Modelo Potencial 
+# Build Model
+model = models.Sequential()
+# 1st convolution layer
+model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same', input_shape=input_shape))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(BatchNormalization())
+# 2nd convolution layer
+model.add(Conv2D(64, kernel_size=(3, 3), activation='relu', padding='same'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(BatchNormalization())
+# 3rd convolution layer
+model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', padding='same'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(BatchNormalization())
+# fully-connected layers
+model.add(layers.Flatten())
+model.add(layers.Dense(128, activation='relu'))
+model.add(layers.Dense(num_classes, activation='softmax'))
+model.summary()
