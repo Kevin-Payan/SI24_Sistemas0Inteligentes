@@ -20,24 +20,12 @@ def mediapipe_detection(image,model):
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     return image, results 
 
-#Draw Hands (Colors are in BGR format)
-def draw_landmarks(image, results):
-    # Draw left hand 
-    mp_drawing.draw_landmarks(
-    image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
-    mp_drawing.DrawingSpec(color=(255, 0, 255), thickness=2, circle_radius=2), #Circles
-    mp_drawing.DrawingSpec(color=(127, 0, 255), thickness=2) #Lines
-    ) 
-    # Draw right hand   
-    mp_drawing.draw_landmarks(
-    image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
-    mp_drawing.DrawingSpec(color=(255, 255, 0), thickness=2, circle_radius=2), #Circles
-    mp_drawing.DrawingSpec(color=(255, 127, 0), thickness=2) #Lines
-    ) 
-
 
 # Draw Hands with bounding box (Colors are in BGR format)
-def draw_landmarksB(image, results, padding=40):  # padding parameter with a default of 20 pixels
+def draw_landmarks(image, results, padding=40):  # padding parameter with a default of 20 pixels
+
+    hand_coordinates = {}  # Dictionary for bounding box coordinates
+
     # Draw left hand
     if results.left_hand_landmarks:
         # Calculate the bounding box for the left hand with padding
@@ -52,8 +40,11 @@ def draw_landmarksB(image, results, padding=40):  # padding parameter with a def
         y_min = max(0, y_min)
         y_max = min(image.shape[0], y_max)
 
+        # Store the left hand coordinates
+        hand_coordinates['left_hand'] = {'x_min': int(x_min), 'y_min': int(y_min), 'x_max': int(x_max), 'y_max': int(y_max)}
+
         # Draw the rectangle with padding
-        cv2.rectangle(image, (int(x_min), int(y_min)), (int(x_max), int(y_max)), (0, 255, 0), 2)  # Green rectangle
+        cv2.rectangle(image, (int(x_min), int(y_min)), (int(x_max), int(y_max)), (0, 0, 255), 2)  # Green rectangle
         
         # Draw landmarks
         mp_drawing.draw_landmarks(
@@ -76,6 +67,9 @@ def draw_landmarksB(image, results, padding=40):  # padding parameter with a def
         y_min = max(0, y_min)
         y_max = min(image.shape[0], y_max)
 
+         # Store the right hand coordinates
+        hand_coordinates['right_hand'] = {'x_min': int(x_min), 'y_min': int(y_min), 'x_max': int(x_max), 'y_max': int(y_max)}
+
         # Draw the rectangle with padding
         cv2.rectangle(image, (int(x_min), int(y_min)), (int(x_max), int(y_max)), (255, 0, 0), 2)  # Blue rectangle
         
@@ -85,6 +79,10 @@ def draw_landmarksB(image, results, padding=40):  # padding parameter with a def
             mp_drawing.DrawingSpec(color=(255, 255, 0), thickness=2, circle_radius=2),  # Circles
             mp_drawing.DrawingSpec(color=(255, 127, 0), thickness=2)  # Lines
         )
+
+    return hand_coordinates  # Return a dictionary that points to two other dictionaries containing the coordinates
+
+
 
     
 cap = cv2.VideoCapture(0)
@@ -96,16 +94,53 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
         #Selfie View 
         #Since we are changing the view, the setting for the left hand will apear on the right hand on screan and viceversa. 
         frame = cv2.flip(frame,1)
+
+        # Save the current frame (No hand drawing)
+        cv2.imwrite('captured_frame.jpg', frame)  
+        print("Frame saved.")
+
         # Make detections
         frame, results = mediapipe_detection(frame, holistic)
-        # Extract Keypoints 
+
+        # Get & Draw landmarks
+        hand_coordinates = draw_landmarks(frame, results)  
+
+        if 'left_hand' in hand_coordinates:
+            left_hand_box = hand_coordinates['left_hand']
+            cropped_frame_lh = frame[left_hand_box['y_min']:left_hand_box['y_max'], left_hand_box['x_min']:left_hand_box['x_max']]
+        else:
+            cropped_frame_lh = frame
+
+        if 'right_hand' in hand_coordinates:
+            right_hand_box = hand_coordinates['right_hand']
+            cropped_frame_rh = frame[right_hand_box['y_min']:right_hand_box['y_max'], right_hand_box['x_min']:right_hand_box['x_max']]
+        else:
+            cropped_frame_rh = frame
+  
+        # Save the current frame (Hand drawing)
+        if frame.size > 0:
+            cv2.imwrite('captured_frame1.jpg', cropped_frame_lh)  
+            cv2.imwrite('captured_frame2.jpg', cropped_frame_rh) 
+            print("Frames saved.")
+        else:
+            print("Failed to save.")
+
+        # Show to screen
+        cv2.putText(frame, "Press 'q' to end", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.imshow('OpenCV Feed', frame)
+        # Check if 'q' is pressed to end hand tracking.
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+
+
+
+    """ 
         # Get results in one single array, if doesnt exist add 0s. 
         left_hand_nparray = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
         right_hand_nparray = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
-        """
-
-        #Normalizar a 200x200?
-
+       
         #Analizar comportamiento
         print('Left Hand np array')
         print(len(left_hand_nparray))
@@ -118,15 +153,15 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
         print('-------------------')
         print(right_hand_nparray)
         print('-------------------')
-        """
-        # Draw landmarks
-        draw_landmarksB(frame, results)  
-        # Show to screen
-        cv2.putText(frame, "Press 'q' to end", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-        cv2.imshow('OpenCV Feed', frame)
-        # Check if 'q' is pressed to end hand tracking.
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    cap.release()
-    cv2.destroyAllWindows()
+    """
 
+"""
+    # Check if the left hand data is available
+if 'left_hand' in hand_coordinates:
+    left_hand_box = hand_coordinates['left_hand']
+    print("Left Hand Bounding Box:")
+    print(f"X Min: {left_hand_box['x_min']}")
+    print(f"Y Min: {left_hand_box['y_min']}")
+    print(f"X Max: {left_hand_box['x_max']}")
+    print(f"Y Max: {left_hand_box['y_max']}")
+"""
