@@ -1,4 +1,3 @@
-# Import Libraries
 import cv2
 import numpy as np
 import os 
@@ -22,8 +21,8 @@ def mediapipe_detection(image,model):
 
 
 # Draw Hands with bounding box (Colors are in BGR format)
-def draw_landmarks(image, results, padding=40):  # padding parameter with a default of 20 pixels
-
+def draw_landmarks(image, results, padding=40):  # padding parameter 
+    
     hand_coordinates = {}  # Dictionary for bounding box coordinates
 
     # Draw left hand
@@ -83,21 +82,17 @@ def draw_landmarks(image, results, padding=40):  # padding parameter with a defa
     return hand_coordinates  # Return a dictionary that points to two other dictionaries containing the coordinates
 
 
-
-    
 cap = cv2.VideoCapture(0)
 # Set mediapipe model 
 with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=0.5) as holistic:
     while cap.isOpened():
         # Read feed
         ret, frame = cap.read()
-        #Selfie View 
-        #Since we are changing the view, the setting for the left hand will apear on the right hand on screan and viceversa. 
-        frame = cv2.flip(frame,1)
 
-        # Save the current frame (No hand drawing)
-        cv2.imwrite('captured_frame.jpg', frame)  
-        print("Frame saved.")
+        #Selfie View 
+        #Since we are changing the view, the setting for the left hand will apear on the right hand on screan and viceversa?
+        frame = cv2.flip(frame,1)
+        frame_for_saving = frame.copy()
 
         # Make detections
         frame, results = mediapipe_detection(frame, holistic)
@@ -107,21 +102,22 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
 
         if 'left_hand' in hand_coordinates:
             left_hand_box = hand_coordinates['left_hand']
-            cropped_frame_lh = frame[left_hand_box['y_min']:left_hand_box['y_max'], left_hand_box['x_min']:left_hand_box['x_max']]
+            cropped_frame_lh = frame_for_saving[left_hand_box['y_min']:left_hand_box['y_max'], left_hand_box['x_min']:left_hand_box['x_max']]
         else:
-            cropped_frame_lh = frame
+            cropped_frame_lh = frame_for_saving
 
         if 'right_hand' in hand_coordinates:
             right_hand_box = hand_coordinates['right_hand']
-            cropped_frame_rh = frame[right_hand_box['y_min']:right_hand_box['y_max'], right_hand_box['x_min']:right_hand_box['x_max']]
+            cropped_frame_rh = frame_for_saving[right_hand_box['y_min']:right_hand_box['y_max'], right_hand_box['x_min']:right_hand_box['x_max']]
         else:
-            cropped_frame_rh = frame
-  
-        # Save the current frame (Hand drawing)
+            cropped_frame_rh = frame_for_saving
+
+
+        #SI ES NECESARIO BORRAR ESTO PARA MEJOR PERFORMANCE
+        # Save the current frame (Hand drawing)  
         if frame.size > 0:
-            cv2.imwrite('captured_frame1.jpg', cropped_frame_lh)  
-            cv2.imwrite('captured_frame2.jpg', cropped_frame_rh) 
-            print("Frames saved.")
+            cv2.imwrite('Left_Hand.jpg', cropped_frame_lh)  
+            cv2.imwrite('Right_Hand.jpg', cropped_frame_rh) 
         else:
             print("Failed to save.")
 
@@ -164,4 +160,10 @@ if 'left_hand' in hand_coordinates:
     print(f"Y Min: {left_hand_box['y_min']}")
     print(f"X Max: {left_hand_box['x_max']}")
     print(f"Y Max: {left_hand_box['y_max']}")
+"""
+
+"""
+# Save the current frame (hand drawing)
+        cv2.imwrite('captured_framee.jpg', frame)  
+        print("Frame saved.")
 """
