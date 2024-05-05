@@ -5,6 +5,8 @@ import matplotlib as plt
 import time 
 import mediapipe as mp
 
+from tensorflow.python.keras.models import load_model
+
 # Model Detection + Drawing
 
 mp_holistic = mp.solutions.holistic #Holistic Model
@@ -21,8 +23,8 @@ def mediapipe_detection(image,model):
 
 
 # Draw Hands with bounding box (Colors are in BGR format)
-def draw_landmarks(image, results, padding=40):  # padding parameter 
-    
+def draw_landmarks(image, results, padding=50):  # padding parameter 
+
     hand_coordinates = {}  # Dictionary for bounding box coordinates
 
     # Draw left hand
@@ -92,6 +94,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
         #Selfie View 
         #Since we are changing the view, the setting for the left hand will apear on the right hand on screan and viceversa?
         frame = cv2.flip(frame,1)
+        
         frame_for_saving = frame.copy()
 
         # Make detections
@@ -100,21 +103,25 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
         # Get & Draw landmarks
         hand_coordinates = draw_landmarks(frame, results)  
 
+        if frame.size > 0:
+            cv2.imwrite('Before.jpg', frame) 
+
         if 'left_hand' in hand_coordinates:
             left_hand_box = hand_coordinates['left_hand']
             cropped_frame_lh = frame_for_saving[left_hand_box['y_min']:left_hand_box['y_max'], left_hand_box['x_min']:left_hand_box['x_max']]
         else:
-            cropped_frame_lh = frame_for_saving
+            cropped_frame_lh = frame_for_saving # ¿Que hacer/enviar cuando no detecta nada?
 
         if 'right_hand' in hand_coordinates:
             right_hand_box = hand_coordinates['right_hand']
             cropped_frame_rh = frame_for_saving[right_hand_box['y_min']:right_hand_box['y_max'], right_hand_box['x_min']:right_hand_box['x_max']]
         else:
-            cropped_frame_rh = frame_for_saving
+            cropped_frame_rh = frame_for_saving # ¿Que hacer/enviar cuando no detecta nada?
 
+        # cropped_framelh -> Predict
+        # cropped_framerh -> Predict
 
-        #SI ES NECESARIO BORRAR ESTO PARA MEJOR PERFORMANCE
-        # Save the current frame (Hand drawing)  
+        # Save the current frame for visualization (borrar esto ya que sirva)
         if frame.size > 0:
             cv2.imwrite('Left_Hand.jpg', cropped_frame_lh)  
             cv2.imwrite('Right_Hand.jpg', cropped_frame_rh) 
