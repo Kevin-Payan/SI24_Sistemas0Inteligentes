@@ -3,6 +3,7 @@ from tensorflow.python.keras import models, layers
 from tensorflow.python.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense 
 from keras.layers import BatchNormalization
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
 ##Normalizar a 200x200, checa las properties, details de las imagenes
 
@@ -25,6 +26,17 @@ test_path = 'C:/Users/kevin/Desktop/ASL_Dataset/asl_alphabet_test'
 #Prueba
 test_image = 'C:/Users/kevin/Desktop/ASL_Dataset/prueba.jpg'
 
+"""
+#Prueba
+test_image = 'C:/Users/kevin/Desktop/ASL_Dataset/prueba.jpg'
+
+# Load an image
+img = mpimg.imread(test_image)
+# Get image dimensions
+height, width, channels = img.shape
+
+print(f'Width: {width}, Height: {height}, Channels: {channels}')
+"""
 
 # Training & Validation Split (infers class labels from the subdirectory names)
 
@@ -44,14 +56,20 @@ validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
     batch_size=16 
 )
 
+test_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+    test_path,
+    seed=123,
+    batch_size=3 
+)
+
 # Get the number of classes 
 num_classes = len(train_dataset.class_names)
 
 
 # Build Model
 model = models.Sequential()
-# 1st convolution layer
-model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same', input_shape=(200,200) ))
+# 1st convolution layer                                                     #200x200 (tamano) x RGB DUDA TAMANO 
+model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same', input_shape=(256,256,3) ))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(BatchNormalization()) #Que es batch normalization?
 # 2nd convolution layer
@@ -75,9 +93,9 @@ model.summary()
 model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy']) 
 
 # Training
-history = model.fit(train_dataset, validation_dataset, epochs=5)
+history = model.fit(train_dataset, validation_data=validation_dataset, epochs=5)
 
-# Plotting training history 
+# Plotting training history (Cambia esto por TensorBoard??)
 plt.plot(history.history['accuracy'], label='accuracy')
 plt.plot(history.history['val_accuracy'], label='validation accuracy')
 plt.xlabel('Epoch')
@@ -86,9 +104,8 @@ plt.ylim([0, 1])
 plt.legend(loc='lower right')
 plt.show()
 
-"""
 # Evaluation
-test_loss, test_acc = model.evaluate(test_images, test_labels)
+test_loss, test_acc = model.evaluate(test_dataset)
 print('\nTest loss:', test_loss)
 print('Test accuracy:', test_acc)
-"""
+
