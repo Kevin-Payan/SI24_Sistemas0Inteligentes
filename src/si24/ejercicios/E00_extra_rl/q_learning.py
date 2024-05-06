@@ -43,8 +43,11 @@ if __name__ == "__main__":
 
     env = gym.make("CliffWalking-v0", render_mode="human")
     
+    """
     q_table_file = 'q_table_episode_1000.npy'
-    agent = QLearningAgent(env, q_table_file)
+    """
+    agent = QLearningAgent(env, q_table_file) 
+    
 
     obs, _ = env.reset()
     done = False
@@ -61,7 +64,7 @@ if __name__ == "__main__":
 
 
     
-    """ n_episodes = 1001
+    n_episodes = 1001
     episode_length = 200
     agent = QLearningAgent(env, alpha=0.5, gamma=0.9, epsilon=1)
     for e in range(n_episodes):
@@ -87,5 +90,6 @@ if __name__ == "__main__":
         # Se guarda la Q-table cada 100 episodios
         if (e) % 100 == 0:
             np.save(f'q_table_episode_{e}.npy', agent.Q)
-    env.close() """
+    env.close() 
+   
    
