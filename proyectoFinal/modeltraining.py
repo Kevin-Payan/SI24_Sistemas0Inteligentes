@@ -1,19 +1,22 @@
 import tensorflow as tf
 from tensorflow.python.keras import models, layers
+from tensorflow.python.keras.callbacks import TensorBoard
 from tensorflow.python.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense 
 from keras.layers import BatchNormalization
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import datetime
+
 
 ##Normalizar a 200x200, checa las properties, details de las imagenes
 
-##Train Test Split y ver como acceder a los mismos 
+##Train Test Split ✅
 ##Data Augmentation!!!
+##Normalizar a -1 1 o 0 1 
 ##Construir el Modelo ✅
 ##Compilar el Modelo ✅
 ##Entrenar con grafica ✅
 ##Evaluar✅
-#Debug
 #Guardar
 #Implementar en main 
 
@@ -69,7 +72,7 @@ num_classes = len(train_dataset.class_names)
 # Build Model
 model = models.Sequential()
 # 1st convolution layer                                                     #200x200 (tamano) x RGB DUDA TAMANO 
-model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same', input_shape=(256,256,3) ))
+model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same', input_shape=(200,200,3) ))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(BatchNormalization()) #Que es batch normalization?
 # 2nd convolution layer
@@ -92,17 +95,14 @@ model.summary()
 # Compile Model
 model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy']) 
 
-# Training
-history = model.fit(train_dataset, validation_data=validation_dataset, epochs=5)
+# Setup TensorBoard callback
+log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-# Plotting training history (Cambia esto por TensorBoard??)
-plt.plot(history.history['accuracy'], label='accuracy')
-plt.plot(history.history['val_accuracy'], label='validation accuracy')
-plt.xlabel('Epoch')
-plt.ylabel('Accuracy')
-plt.ylim([0, 1])
-plt.legend(loc='lower right')
-plt.show()
+# Training
+history = model.fit(train_dataset, validation_data=validation_dataset, epochs=5, callbacks=[tensorboard_callback])
+# tensorboard --logdir=logs/fit  (correr en terminal)
+
 
 # Evaluation
 test_loss, test_acc = model.evaluate(test_dataset)
