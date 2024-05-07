@@ -12,13 +12,13 @@ import datetime
 
 ##Train Test Split ✅
 ##Data Augmentation!!!
-##Normalizar a -1 1 o 0 1 
+##Normalizar a -1 1 o 0 1 ✅
 ##Construir el Modelo ✅
 ##Compilar el Modelo ✅
 ##Entrenar con grafica ✅
 ##Evaluar✅
-#Guardar
-#Implementar en main 
+# Guardar Modelo ✅
+#Implementar modelo en main 
 
 # Define the path to the dataset
 dataset_path = 'C:/Users/kevin/Desktop/ASL_Dataset/asl_alphabet'
@@ -29,17 +29,9 @@ test_path = 'C:/Users/kevin/Desktop/ASL_Dataset/asl_alphabet_test'
 #Prueba
 test_image = 'C:/Users/kevin/Desktop/ASL_Dataset/prueba.jpg'
 
-"""
-#Prueba
-test_image = 'C:/Users/kevin/Desktop/ASL_Dataset/prueba.jpg'
-
-# Load an image
-img = mpimg.imread(test_image)
-# Get image dimensions
-height, width, channels = img.shape
-
-print(f'Width: {width}, Height: {height}, Channels: {channels}')
-"""
+#Map from 0-255 to 0-1
+def preprocess(image, label):
+    return tf.cast(image, tf.float32) / 255.0, label
 
 # Dataset Split (infers class labels from the subdirectory names)
 
@@ -48,7 +40,9 @@ train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
     validation_split=0.2,
     subset="training",
     seed=123,
-    batch_size=16 #32 truena en mi laptop xd
+    batch_size=16, #32 truena en mi laptop xd
+    image_size=(200, 200),
+    color_mode="grayscale"
 )
 
 validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
@@ -56,23 +50,32 @@ validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
     validation_split=0.2,
     subset="validation",
     seed=123,
-    batch_size=16 
+    batch_size=16,
+    image_size=(200, 200),
+    color_mode="grayscale"
 )
 
 test_dataset = tf.keras.preprocessing.image_dataset_from_directory(
     test_path,
     seed=123,
-    batch_size=3 
+    batch_size=16,
+    image_size=(200, 200),
+    color_mode="grayscale"
 )
 
 # Get the number of classes 
 num_classes = len(train_dataset.class_names)
 
+# Apply preprocessing to the dataset
+train_dataset = train_dataset.map(preprocess)
+validation_dataset = validation_dataset.map(preprocess)
+test_dataset = test_dataset.map(preprocess)
+
 
 # Build Model
 model = models.Sequential()
 # 1st convolution layer                                                    
-model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same', input_shape=(200,200,3) ))
+model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', padding='same', input_shape=(200,200,1) ))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(BatchNormalization()) # Que es ?
 # 2nd convolution layer
@@ -100,7 +103,7 @@ log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
 # Training
-history = model.fit(train_dataset, validation_data=validation_dataset, epochs=3, callbacks=[tensorboard_callback])
+history = model.fit(train_dataset, validation_data=validation_dataset, epochs=5, callbacks=[tensorboard_callback])
 # tensorboard --logdir=logs/fit  (Run in Terminal)
 # http://localhost:6006/?darkMode=true (Open in Browser)
 
@@ -112,10 +115,10 @@ print('Test accuracy:', test_acc)
 
 """
 #Save whole model
-model.save("Gesture_Recog_ASL")
+model.save("GestureRecog_ASL_model")
 
 #Load a model
-new_model = tf.keras.models.load_model("Gesture_Recog_ASL")
+new_model = tf.keras.models.load_model("GestureRecog_ASL_model")
 
 #Save only weights
 model.save_weights("Gesture_Recog_ASL_weights")
