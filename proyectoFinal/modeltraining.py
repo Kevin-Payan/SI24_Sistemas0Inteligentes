@@ -2,11 +2,12 @@ import tensorflow as tf
 from tensorflow.python.keras import models, layers
 from tensorflow.python.keras.callbacks import TensorBoard
 from tensorflow.python.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense 
+from tensorflow.python.keras.callbacks import ModelCheckpoint
 from keras.layers import BatchNormalization
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import datetime
-
+#import h5py
 
 ##Normalizar a 200x200, checa las properties, details de las imagenes
 
@@ -100,10 +101,12 @@ model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=
 
 # Setup TensorBoard callback
 log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1) 
+# Create ModelCheckpoint callback
+checkpoint = ModelCheckpoint(filepath='data', monitor='val_accuracy', save_best_only=True, mode='max')
 
 # Training
-history = model.fit(train_dataset, validation_data=validation_dataset, epochs=5, callbacks=[tensorboard_callback])
+history = model.fit(train_dataset, validation_data=validation_dataset, epochs=3, callbacks=[tensorboard_callback, checkpoint])
 # tensorboard --logdir=logs/fit  (Run in Terminal)
 # http://localhost:6006/?darkMode=true (Open in Browser)
 
