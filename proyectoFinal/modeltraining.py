@@ -12,23 +12,29 @@ import datetime
 ##Normalizar a 200x200, checa las properties, details de las imagenes
 
 ##Train Test Split ✅
-##Data Augmentation!!!
+##Data Augmentation!!! (Primero prueben jugar con la iluminacion porque el dataset es mas oscuro)
 ##Normalizar a -1 1 o 0 1 ✅
 ##Construir el Modelo ✅
 ##Compilar el Modelo ✅
-##Entrenar con grafica ✅
+##Entrenar con grafica (Tensorboard) ✅
 ##Evaluar✅
 # Guardar Modelo ✅
 #Implementar modelo en main 
+
+"""
+# List of available GPUs
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    print("Available GPUs:", gpus)
+else:
+    print("No GPU devices found.")
+"""
 
 # Define the path to the dataset
 dataset_path = 'C:/Users/kevin/Desktop/ASL_Dataset/asl_alphabet'
 
 # Define the path to the test images
 test_path = 'C:/Users/kevin/Desktop/ASL_Dataset/asl_alphabet_test'
-
-#Prueba
-test_image = 'C:/Users/kevin/Desktop/ASL_Dataset/prueba.jpg'
 
 #Map from 0-255 to 0-1
 def preprocess(image, label):
@@ -67,11 +73,32 @@ test_dataset = tf.keras.preprocessing.image_dataset_from_directory(
 # Get the number of classes 
 num_classes = len(train_dataset.class_names)
 
+"""
+print(train_dataset.class_names)
+print(test_dataset.class_names)
+"""
+
 # Apply preprocessing to the dataset
 train_dataset = train_dataset.map(preprocess)
 validation_dataset = validation_dataset.map(preprocess)
 test_dataset = test_dataset.map(preprocess)
 
+
+# Visualize random images from specified datasets
+def visualize_datasets(datasets, titles, num_images=9):
+    for dataset, title in zip(datasets, titles):
+        plt.figure(figsize=(10, 10))
+        plt.suptitle(title)
+        for images, labels in dataset.take(1):  
+            for i in range(num_images):  
+                ax = plt.subplot(3, 3, i + 1)  
+                plt.imshow(images[i].numpy().squeeze(), cmap='gray')
+                plt.title(f"Label: {labels[i].numpy()}")
+                plt.axis("off")
+        plt.show()
+
+# Call the function to visualize images 
+visualize_datasets([train_dataset, test_dataset], ['Train Dataset', 'Test Dataset'])
 
 # Build Model
 model = models.Sequential()
@@ -102,11 +129,12 @@ model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=
 # Setup TensorBoard callback
 log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1) 
+
 # Create ModelCheckpoint callback
 checkpoint = ModelCheckpoint(filepath='data', monitor='val_accuracy', save_best_only=True, mode='max')
 
 # Training
-history = model.fit(train_dataset, validation_data=validation_dataset, epochs=3, callbacks=[tensorboard_callback, checkpoint])
+history = model.fit(train_dataset, validation_data=validation_dataset, epochs=15, callbacks=[tensorboard_callback, checkpoint])
 # tensorboard --logdir=logs/fit  (Run in Terminal)
 # http://localhost:6006/?darkMode=true (Open in Browser)
 
