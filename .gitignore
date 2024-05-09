@@ -2,6 +2,9 @@
 __pycache__/
 *.py[cod]
 *$py.class
+src/si24/datasets/
+src/si24/proyectos/P02_facial_expressions/data/
+src/si24/proyectos/P02_facial_expressions/data/train.csv
 
 # C extensions
 *.so

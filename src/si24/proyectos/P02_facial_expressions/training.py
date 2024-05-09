@@ -27,19 +27,28 @@ def validation_step(val_loader, net, cost_function):
     val_loss = 0.0
     for i, batch in enumerate(val_loader, 0):
         batch_imgs = batch['transformed']
+        batch_imgs = batch_imgs.cuda()
         batch_labels = batch['label']
+        batch_labels = batch_labels.cuda()
         device = net.device
         batch_labels = batch_labels.to(device)
         with torch.inference_mode():
             # TODO: realiza un forward pass, calcula el loss y acumula el costo
-            ...
-    # TODO: Regresa el costo promedio por minibatch
-    return ...
+            preds, logits, proba = net(batch_imgs) #Forward pass
+
+            criterion = nn.CrossEntropyLoss()
+
+            costo = criterion(preds, batch_labels)
+
+            val_loss += costo.item()
+
+    # TODO: Regresa el costo promedio por minibatch 
+    return val_loss/len(val_loader)
 
 def train():
     # Hyperparametros
-    learning_rate = 1e-4
-    n_epochs=100
+    learning_rate = 2e-4 # 1e-4 = 0.0001
+    n_epochs=20
     batch_size = 256
 
     # Train, validation, test loaders
@@ -59,30 +68,47 @@ def train():
                      n_classes = 7)
 
     # TODO: Define la funcion de costo
-    criterion = ...
+    criterion = nn.CrossEntropyLoss() #Funcion de costo
 
+    print(modelo.parameters())
     # Define el optimizador
-    optimizer = ...
+    optimizer = optim.Adam(modelo.parameters(), lr=learning_rate, betas=(0.9, 0.999), eps=4e-4, amsgrad=False)
 
     best_epoch_loss = np.inf
     for epoch in range(n_epochs):
         train_loss = 0
         for i, batch in enumerate(tqdm(train_loader, desc=f"Epoch: {epoch}")):
             batch_imgs = batch['transformed']
+            batch_imgs = batch_imgs.cuda()
             batch_labels = batch['label']
+            batch_labels = batch_labels.cuda()
             # TODO Zero grad, forward pass, backward pass, optimizer step
-            ...
+            optimizer.zero_grad()
+
+            # forward pass
+            preds, logits, proba = modelo(batch_imgs)
+
+            # backward pass
+            costo = criterion(preds, batch_labels)
+            costo.backward()
+             # actualizacion
+            optimizer.step()
+
 
             # TODO acumula el costo
-            ...
+            train_loss += costo.item()
 
         # TODO Calcula el costo promedio
-        train_loss = ...
+        train_loss = train_loss / len(train_loader)
         val_loss = validation_step(val_loader, modelo, criterion)
         tqdm.write(f"Epoch: {epoch}, train_loss: {train_loss:.2f}, val_loss: {val_loss:.2f}")
 
         # TODO guarda el modelo si el costo de validación es menor al mejor costo de validación
-        ...
+        if(val_loss < best_epoch_loss):
+            best_epoch_loss = val_loss
+            modelo.save_model(model_name="modelo_crack")
+
+
         plotter.on_epoch_end(epoch, train_loss, val_loss)
     plotter.on_train_end()
 

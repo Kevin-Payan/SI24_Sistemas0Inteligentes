@@ -26,7 +26,7 @@ def predict(img_title_paths):
     '''
     # Cargar el modelo
     modelo = Network(48, 7)
-    modelo.load_model("modelo_1.pt")
+    modelo.load_model("arq1_exp2")
     for path in img_title_paths:
         # Cargar la imagen
         # np.ndarray, torch.Tensor
@@ -34,8 +34,8 @@ def predict(img_title_paths):
         original, transformed, denormalized = load_img(im_file)
 
         # Inferencia
-        logits, proba = modelo.predict(transformed)
-        pred = torch.argmax(proba, -1).item()
+        logits = modelo.predict(transformed.cuda())
+        pred = torch.argmax(logits, -1).item()
         pred_label = EMOTIONS_MAP[pred]
 
         # Original / transformada

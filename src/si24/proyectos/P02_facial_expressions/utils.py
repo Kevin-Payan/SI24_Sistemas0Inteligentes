@@ -91,7 +91,7 @@ def to_numpy(tensor: torch.tensor, roll_dims = True):
     array = tensor.detach().cpu().numpy()
     return array
 
-def add_img_text(img: np.ndarray, text_label: str):
+def add_img_text(img: np.ndarray, text_label: str): #Este se uso en dataset.py
     '''
     Add text to image
     args:
@@ -101,7 +101,7 @@ def add_img_text(img: np.ndarray, text_label: str):
     '''
     font = cv2.FONT_HERSHEY_SIMPLEX
     fontScale = 1
-    fontColor = (255, 0, 0)
+    fontColor = (0, 255, 128) #RGB en orden Blue, Green and Red
     thickness = 2
 
     # For the text background
@@ -122,7 +122,7 @@ def add_img_text(img: np.ndarray, text_label: str):
                       font, fontScale, fontColor, thickness)
     return img
 
-def create_train_val_split():
+def create_train_val_split(): #Este se uso en dataset.py
     # Usado para crear split.json
     import pandas as pd
     train_csv = file_path / "data/train.csv"
