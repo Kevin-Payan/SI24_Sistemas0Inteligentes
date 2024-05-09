@@ -48,8 +48,8 @@ def validation_step(val_loader, net, cost_function):
 def train():
     # Hyperparametros
     learning_rate = 1e-4 # 1e-4 = 0.0001
-    n_epochs=35
-    batch_size = 256
+    n_epochs=300
+    batch_size = 64
 
     # Train, validation, test loaders
     train_dataset, train_loader = \
