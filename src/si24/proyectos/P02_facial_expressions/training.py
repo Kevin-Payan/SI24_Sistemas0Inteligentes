@@ -34,7 +34,7 @@ def validation_step(val_loader, net, cost_function):
         batch_labels = batch_labels.to(device)
         with torch.inference_mode():
             # TODO: realiza un forward pass, calcula el loss y acumula el costo
-            preds, logits, proba = net(batch_imgs) #Forward pass
+            preds= net(batch_imgs) #Forward pass
 
             criterion = nn.CrossEntropyLoss()
 
@@ -86,7 +86,7 @@ def train():
             optimizer.zero_grad()
 
             # forward pass
-            preds, logits, proba = modelo(batch_imgs)
+            preds = modelo(batch_imgs)
 
             # backward pass
             costo = criterion(preds, batch_labels)

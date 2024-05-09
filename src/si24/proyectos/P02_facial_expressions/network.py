@@ -25,40 +25,25 @@ class Network(nn.Module):
         super().__init__() 
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-        # TODO: Calcular dimension de salida ✅
-        # TODO: Define las capas de tu red ✅
-
-        #Primera convolucion
         self.conv1 = nn.Conv2d(1, out_channels=24, kernel_size=3) #dimension 46x46
         self.relu1 = nn.ReLU()
-        print("Primera convolucion declarada.")
 
-        #Segunda convolucion
-        self.conv2 = nn.Conv2d(24, out_channels=18, kernel_size=3) #dimension 44x44
+        self.conv2 = nn.Conv2d(24, out_channels=48, kernel_size=3) #dimension 44x44
         self.relu2 = nn.ReLU()
-        print("Segunda convolucion declarada.")
 
-        #Tercera convolucion
-        self.conv3 = nn.Conv2d(18, out_channels=24, kernel_size=5) #dimension 40x40
+        self.conv3 = nn.Conv2d(48, out_channels=84, kernel_size=3) #dimension 42x42
         self.relu3 = nn.ReLU()
-        print("Tercera convolucion declarada.")
 
-        #Cuarta convolucion
-        self.conv4 = nn.Conv2d(24, out_channels=36, kernel_size=7) #dimension 34x34
-        self.relu4 = nn.ReLU()
+        out_channels = 84
+        h_out = 42
+        w_out = 42
 
-        #Primera fully connected
-        h_out = 34
-        w_out = 34
-
-        self.fc1 = nn.Linear(36 * h_out * w_out, 72)
+        self.fc1 = nn.Linear(out_channels * h_out * w_out, 2048)
         self.relu5 = nn.ReLU()
-        print("Primera fully connected declarada.")
 
-        #Segunda fully connected y ultima
-        self.fc2 = nn.Linear(72, n_classes)
+        self.fc2 = nn.Linear(2048, n_classes)
         self.softmax = nn.LogSoftmax(dim=1)
-        print("Segunda y ultima fully connected declarada.")
+    
 
         self.to(self.device)
 
@@ -69,7 +54,7 @@ class Network(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor: 
         # TODO: Define la propagacion hacia adelante de tu red ✅
-        #Primera capa conv
+
         x = self.conv1(x)
         x = F.relu(x)
         print("CONVOLUCION 1 HECHA: ", x.size())
@@ -81,17 +66,11 @@ class Network(nn.Module):
         x = self.conv3(x)
         x = F.relu(x)
         print("CONVOLUCION 3 HECHA: ", x.size())
-        #Cuarta capa conv
-        x = self.conv4(x)
-        x = F.relu(x)
-        print("CONVOLUCION 4 HECHA: ", x.size())
+
+
         #Flatten y primera fully connected
-
-        x = torch.flatten(x)
-
+        x = torch.flatten(x, 1)
         print("FLATTEN HECHO: ", x.size())
-        #print("Esto: ", nn.Flatten(x, 1))
-        #print("Deberia ser lo mismo que: ", x.reshape(-1, 36 * 34 * 34))
         x = self.fc1(x)
         x = F.relu(x)
         print("FULLY CONNECTED 1 HECHA: ", x.size())
@@ -104,10 +83,29 @@ class Network(nn.Module):
 
         #return x, logits, proba #Logits: Raw outputs from final layer, aqui habia return x
         return logits
+    
+    def forward_inference(self, x: torch.Tensor) -> torch.Tensor: 
+
+        x = self.conv1(x)
+        x = F.relu(x)
+        x = self.conv2(x)
+        x = F.relu(x)
+        x = self.conv3(x)
+        x = F.relu(x)
+
+        x = torch.flatten(x)
+        x = self.fc1(x)
+        x = F.relu(x)
+        x = self.fc2(x)
+        logits = x
+        print("logits: ", logits.size())
+        print("logits info: ", logits)
+
+        return logits
 
     def predict(self, x):
         with torch.inference_mode():
-            return self.forward(x)
+            return self.forward_inference(x)
 
     def save_model(self, model_name: str):
         '''
