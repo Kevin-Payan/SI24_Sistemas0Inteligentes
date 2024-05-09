@@ -30,18 +30,20 @@ class Network(nn.Module):
 
         self.conv2 = nn.Conv2d(24, out_channels=48, kernel_size=3) #dimension 44x44
         self.relu2 = nn.ReLU()
+        self.maxpool2 = nn.MaxPool2d(kernel_size=2, stride=1) # dimension 22x22
 
-        self.conv3 = nn.Conv2d(48, out_channels=84, kernel_size=3) #dimension 42x42
+        self.conv3 = nn.Conv2d(48, out_channels=96, kernel_size=3) #dimension 20x20
         self.relu3 = nn.ReLU()
+        self.maxpool3 = nn.MaxPool2d(kernel_size=2, stride=1) # dimension 10x10
 
-        out_channels = 84
-        h_out = 42
-        w_out = 42
+        out_channels = 96
+        h_out = 10
+        w_out = 10
 
-        self.fc1 = nn.Linear(out_channels * h_out * w_out, 2048)
+        self.fc1 = nn.Linear(out_channels * h_out * w_out, 512)
         self.relu5 = nn.ReLU()
 
-        self.fc2 = nn.Linear(2048, n_classes)
+        self.fc2 = nn.Linear(512, n_classes)
         self.softmax = nn.LogSoftmax(dim=1)
     
 
@@ -56,16 +58,20 @@ class Network(nn.Module):
         # TODO: Define la propagacion hacia adelante de tu red ✅
 
         x = self.conv1(x)
-        x = F.relu(x)
         print("CONVOLUCION 1 HECHA: ", x.size())
+        x = F.relu(x)
         #Segunda capa conv
         x = self.conv2(x)
-        x = F.relu(x)
         print("CONVOLUCION 2 HECHA: ", x.size())
+        x = F.relu(x)
+        x = F.max_pool2d(x, kernel_size=2)
+        print("MAX POOLING 1 HECHA: ", x.size())
         #Tercera capa conv
         x = self.conv3(x)
-        x = F.relu(x)
         print("CONVOLUCION 3 HECHA: ", x.size())
+        x = F.relu(x)
+        x = F.max_pool2d(x, kernel_size=2)
+        print("MAX POOLING 2 HECHA: ", x.size())
 
 
         #Flatten y primera fully connected
@@ -90,7 +96,9 @@ class Network(nn.Module):
         x = F.relu(x)
         x = self.conv2(x)
         x = F.relu(x)
+        x = F.max_pool2d(x, kernel_size=2)
         x = self.conv3(x)
+        x = F.max_pool2d(x, kernel_size=2)
         x = F.relu(x)
 
         x = torch.flatten(x)

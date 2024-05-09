@@ -29,7 +29,7 @@ def predict(img_title_paths):
     """
     # Cargar el modelo
     modelo = Network(48, 7)
-    modelo.load_model("arq4_exp1")
+    modelo.load_model("arq6_exp1")
     for path in img_title_paths:
         # Cargar la imagen
         # np.ndarray, torch.Tensor
