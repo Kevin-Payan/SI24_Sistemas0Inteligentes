@@ -109,8 +109,10 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
         if 'left_hand' in hand_coordinates:
             left_hand_box = hand_coordinates['left_hand']
             cropped_frame_lh = frame_for_saving[left_hand_box['y_min']:left_hand_box['y_max'], left_hand_box['x_min']:left_hand_box['x_max']]
+            # cropped_framelh -> Predict
         else:
             cropped_frame_lh = frame_for_saving # ¿Que hacer/enviar cuando no detecta nada?
+            # no predict
 
         if 'right_hand' in hand_coordinates:
             right_hand_box = hand_coordinates['right_hand']
@@ -122,6 +124,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
         # cropped_framerh -> Predict
 
         # Save the current frame for visualization (borrar esto ya que sirva)
+        #Ya que sirva mandar a prediccion y no guardar, guardar lo hace lento. Guardar solo para visualizar
         if frame.size > 0:
             cv2.imwrite('Left_Hand.jpg', cropped_frame_lh)  
             cv2.imwrite('Right_Hand.jpg', cropped_frame_rh) 
