@@ -47,9 +47,10 @@ def validation_step(val_loader, net, cost_function):
 
 def train():
     # Hyperparametros
-    learning_rate = 1e-4 # 1e-4 = 0.0001
-    n_epochs=300
+    learning_rate = 7e-4 # 1e-4 = 0.0001
+    n_epochs=20
     batch_size = 64
+    modelname = "arq6_exp5"
 
     # Train, validation, test loaders
     train_dataset, train_loader = \
@@ -106,7 +107,7 @@ def train():
         # TODO guarda el modelo si el costo de validación es menor al mejor costo de validación
         if(val_loss < best_epoch_loss):
             best_epoch_loss = val_loss
-            modelo.save_model(model_name="modelo_crack")
+            modelo.save_model(model_name=modelname)
 
 
         plotter.on_epoch_end(epoch, train_loss, val_loss)

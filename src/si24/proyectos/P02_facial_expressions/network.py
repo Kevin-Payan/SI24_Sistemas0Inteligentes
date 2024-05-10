@@ -75,10 +75,10 @@ class Network(nn.Module):
 
 
         #Flatten y primera fully connected
-        x = torch.flatten(x, 1)
+        x = torch.flatten(x, 1) # B, C, H, W
         print("FLATTEN HECHO: ", x.size())
         x = self.fc1(x)
-        x = F.relu(x)
+        x = F.relu(x) #x
         print("FULLY CONNECTED 1 HECHA: ", x.size())
         #Segunda y ultima fully connected
         x = self.fc2(x)
@@ -101,14 +101,14 @@ class Network(nn.Module):
         x = F.max_pool2d(x, kernel_size=2)
         x = F.relu(x)
 
-        x = torch.flatten(x)
+        x = torch.flatten(x) # C, H, W
         x = self.fc1(x)
         x = F.relu(x)
         x = self.fc2(x)
         logits = x
         print("logits: ", logits.size())
         print("logits info: ", logits)
-
+        
         return logits
 
     def predict(self, x):
@@ -116,22 +116,9 @@ class Network(nn.Module):
             return self.forward_inference(x)
 
     def save_model(self, model_name: str):
-        '''
-            Guarda el modelo en el path especificado
-            args:
-            - net: definición de la red neuronal (con nn.Sequential o la clase anteriormente definida)
-            - path (str): path relativo donde se guardará el modelo
-        '''
         models_path = file_path / 'models' / model_name
-        # TODO: Guarda los pesos de tu red neuronal en el path especificado
-        torch.save(model_name, models_path)
+        torch.save(self.state_dict(), models_path)
 
     def load_model(self, model_name: str):
-        '''
-            Carga el modelo en el path especificado
-            args:
-            - path (str): path relativo donde se guardó el modelo
-        '''
-        # TODO: Carga los pesos de tu red neuronal
         models_path = file_path / 'models' / model_name
-        torch.load(models_path)
+        self.load_state_dict(torch.load(models_path))

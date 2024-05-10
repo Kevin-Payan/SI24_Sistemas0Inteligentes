@@ -4,7 +4,7 @@ import os
 import cv2
 from network import Network
 import torch
-from utils import to_numpy, get_transforms, add_img_text
+from utils import to_numpy, get_transforms, add_img_text, to_torch
 from dataset import EMOTIONS_MAP
 from glob import glob
 import pathlib
@@ -29,7 +29,7 @@ def predict(img_title_paths):
     """
     # Cargar el modelo
     modelo = Network(48, 7)
-    modelo.load_model("arq6_exp1")
+    modelo.load_model("arq6_exp4")
     for path in img_title_paths:
         # Cargar la imagen
         # np.ndarray, torch.Tensor
@@ -40,6 +40,8 @@ def predict(img_title_paths):
         logits = modelo.predict(transformed.cuda())
         pred = torch.argmax(logits, -1).item()
         pred_label = EMOTIONS_MAP[pred]
+
+        #EMOTIONS_MAP = {  0: "Enojo",  1: "Disgusto",  2: "Miedo", 3: "Alegria", 4: "Tristeza", 5: "Sorpresa", 6: "Neutral"}
 
         # Original / transformada
         h, w = original.shape[:2]
@@ -63,6 +65,16 @@ if __name__ == "__main__":
         "./test_imgs/happy_3.png",
         "./test_imgs/angry.png",
         "./test_imgs/impressed.png",
+        "./test_imgs/neutral.png",
+        "./test_imgs/neutral_2.png",
+        "./test_imgs/sad.png",
+        "./test_imgs/sad_2.png",
+        "./test_imgs/sad_3.png",
+        "./test_imgs/happy_4.png",
+        "./test_imgs/happy_adolfo.png",
+        "./test_imgs/happy_caro.png",
+        "./test_imgs/happy_kevin.png",
+        "./test_imgs/happy_ord.png"
     ]
 
     predict(img_paths)
