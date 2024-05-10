@@ -47,10 +47,10 @@ def validation_step(val_loader, net, cost_function):
 
 def train():
     # Hyperparametros
-    learning_rate = 7e-4 # 1e-4 = 0.0001
-    n_epochs=20
-    batch_size = 64
-    modelname = "arq6_exp5"
+    learning_rate = 5e-4 # 1e-4 = 0.0001
+    n_epochs=25
+    batch_size = 128
+    modelname = "arq8_exp1"
 
     # Train, validation, test loaders
     train_dataset, train_loader = \

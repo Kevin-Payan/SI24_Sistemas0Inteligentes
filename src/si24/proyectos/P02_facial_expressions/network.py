@@ -25,25 +25,32 @@ class Network(nn.Module):
         super().__init__() 
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-        self.conv1 = nn.Conv2d(1, out_channels=24, kernel_size=3) #dimension 46x46
+        self.conv1 = nn.Conv2d(1, out_channels=32, kernel_size=3) #dimension 46x46
         self.relu1 = nn.ReLU()
 
-        self.conv2 = nn.Conv2d(24, out_channels=48, kernel_size=3) #dimension 44x44
+        self.conv2 = nn.Conv2d(32, out_channels=64, kernel_size=3) #dimension 44x44
         self.relu2 = nn.ReLU()
-        self.maxpool2 = nn.MaxPool2d(kernel_size=2, stride=1) # dimension 22x22
+        self.maxpool1 = nn.MaxPool2d(kernel_size=2, stride=1) # dimension 22x22
 
-        self.conv3 = nn.Conv2d(48, out_channels=96, kernel_size=3) #dimension 20x20
+        self.conv3 = nn.Conv2d(64, out_channels=128, kernel_size=3) #dimension 20x20
         self.relu3 = nn.ReLU()
-        self.maxpool3 = nn.MaxPool2d(kernel_size=2, stride=1) # dimension 10x10
+        self.maxpool1 = nn.MaxPool2d(kernel_size=2, stride=1) # dimension 10x10
 
-        out_channels = 96
-        h_out = 10
-        w_out = 10
+        self.conv4 = nn.Conv2d(128, out_channels=256, kernel_size=3) #dimension 8x8
+        self.relu4 = nn.ReLU()
+        self.maxpool3 = nn.MaxPool2d(kernel_size=2, stride=1) # dimension 4x4
 
-        self.fc1 = nn.Linear(out_channels * h_out * w_out, 512)
+        out_channels = 256
+        h_out = 4
+        w_out = 4
+
+        self.fc1 = nn.Linear(out_channels * h_out * w_out, 1024)
         self.relu5 = nn.ReLU()
 
-        self.fc2 = nn.Linear(512, n_classes)
+        self.fc2 = nn.Linear(1024, 512)
+        self.relu6 = nn.ReLU()
+
+        self.fc3 = nn.Linear(512, n_classes)
         self.softmax = nn.LogSoftmax(dim=1)
     
 
@@ -71,6 +78,11 @@ class Network(nn.Module):
         print("CONVOLUCION 3 HECHA: ", x.size())
         x = F.relu(x)
         x = F.max_pool2d(x, kernel_size=2)
+        #Cuarta capa conv
+        x = self.conv4(x)
+        print("CONVOLUCION 4 HECHA: ", x.size())
+        x = F.relu(x)
+        x = F.max_pool2d(x, kernel_size=2)
         print("MAX POOLING 2 HECHA: ", x.size())
 
 
@@ -80,10 +92,14 @@ class Network(nn.Module):
         x = self.fc1(x)
         x = F.relu(x) #x
         print("FULLY CONNECTED 1 HECHA: ", x.size())
-        #Segunda y ultima fully connected
+        #Segunda fully connected
         x = self.fc2(x)
-        logits = x
+        x = F.relu(x)
         print("FULLY CONNECTED 2 HECHA: ", x.size())
+        #Tercera fully connected y ultima
+        x = self.fc3(x)
+        logits = x
+        print("FULLY CONNECTED 3 HECHA: ", x.size())
         print("logits: ", logits.size())
 
 
@@ -98,6 +114,9 @@ class Network(nn.Module):
         x = F.relu(x)
         x = F.max_pool2d(x, kernel_size=2)
         x = self.conv3(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, kernel_size=2)
+        x = self.conv4(x)
         x = F.max_pool2d(x, kernel_size=2)
         x = F.relu(x)
 
@@ -105,6 +124,8 @@ class Network(nn.Module):
         x = self.fc1(x)
         x = F.relu(x)
         x = self.fc2(x)
+        x = F.relu(x)
+        x = self.fc3(x)
         logits = x
         print("logits: ", logits.size())
         print("logits info: ", logits)

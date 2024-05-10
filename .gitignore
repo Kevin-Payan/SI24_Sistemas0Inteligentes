@@ -5,7 +5,11 @@ __pycache__/
 src/si24/datasets/
 src/si24/proyectos/P02_facial_expressions/data/
 src/si24/proyectos/P02_facial_expressions/data/train.csv
-
+src/si24/proyectos/P02_facial_expressions/test_imgs
+src/si24/proyectos/P02_facial_expressions/models/arq6_exp3
+src/si24/proyectos/P02_facial_expressions/models/arq6_exp4
+src/si24/proyectos/P02_facial_expressions/models/arq6_exp5
+src/si24/proyectos/P02_facial_expressions/models/modelo_crack
 # C extensions
 *.so
 

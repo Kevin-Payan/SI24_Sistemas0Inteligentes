@@ -29,7 +29,7 @@ def predict(img_title_paths):
     """
     # Cargar el modelo
     modelo = Network(48, 7)
-    modelo.load_model("arq6_exp4")
+    modelo.load_model("arq8_exp1")
     for path in img_title_paths:
         # Cargar la imagen
         # np.ndarray, torch.Tensor
@@ -74,7 +74,31 @@ if __name__ == "__main__":
         "./test_imgs/happy_adolfo.png",
         "./test_imgs/happy_caro.png",
         "./test_imgs/happy_kevin.png",
-        "./test_imgs/happy_ord.png"
+        "./test_imgs/happy_ord.png",
+        "./test_imgs/angry_adolfo.png",
+        "./test_imgs/angry_caro.png",
+        "./test_imgs/angry_kevin.png",
+        "./test_imgs/angry_ord.png",
+        "./test_imgs/scary_adolfo.png",
+        "./test_imgs/scary_caro.png",
+        "./test_imgs/scary_kevin.png",
+        "./test_imgs/scary_ord.png",
+        "./test_imgs/sad_adolfo.png",
+        "./test_imgs/sad_caro.png",
+        "./test_imgs/sad_kevin.png",
+        "./test_imgs/sad_ord.png",
+        "./test_imgs/dislike_adolfo.png",
+        "./test_imgs/dislike_caro.png",
+        "./test_imgs/dislike_kevin.png",
+        "./test_imgs/dislike_ord.png",
+        "./test_imgs/impressed_adolfo.png",
+        "./test_imgs/impressed_caro.png",
+        "./test_imgs/impressed_kevin.png",
+        "./test_imgs/impressed_ord.png",
+        "./test_imgs/neutral_adolfo.png",
+        "./test_imgs/neutral_caro.png",
+        "./test_imgs/neutral_kevin.png",
+        "./test_imgs/neutral_ord.png"
     ]
 
     predict(img_paths)
