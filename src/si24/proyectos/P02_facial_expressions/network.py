@@ -25,7 +25,7 @@ class Network(nn.Module):
         super().__init__() 
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-        self.conv1 = nn.Conv2d(1, out_channels=32, kernel_size=3) #dimension 46x46
+        """ self.conv1 = nn.Conv2d(1, out_channels=32, kernel_size=3) #dimension 46x46 #Arquitectura 8
         self.relu1 = nn.ReLU()
 
         self.conv2 = nn.Conv2d(32, out_channels=64, kernel_size=3) #dimension 44x44
@@ -51,6 +51,27 @@ class Network(nn.Module):
         self.relu6 = nn.ReLU()
 
         self.fc3 = nn.Linear(512, n_classes)
+        self.softmax = nn.LogSoftmax(dim=1) """
+
+        self.conv1 = nn.Conv2d(1, out_channels=16, kernel_size=3) #dimension 46x46 #Arquitectura 7
+        self.relu1 = nn.ReLU()
+
+        self.conv2 = nn.Conv2d(16, out_channels=32, kernel_size=3, stride=2) #dimension 22x22
+        self.relu2 = nn.ReLU()
+
+        self.conv3 = nn.Conv2d(32, out_channels=32, kernel_size=3, stride=2) #dimension 10x10
+        self.relu3 = nn.ReLU()
+
+        self.relu4 = nn.ReLU()
+
+        out_channels = 32
+        h_out = 10
+        w_out = 10
+
+        self.fc1 = nn.Linear(out_channels * h_out * w_out, 128)
+        self.relu5 = nn.ReLU()
+
+        self.fc2 = nn.Linear(128, n_classes)
         self.softmax = nn.LogSoftmax(dim=1)
     
 
@@ -71,21 +92,16 @@ class Network(nn.Module):
         x = self.conv2(x)
         print("CONVOLUCION 2 HECHA: ", x.size())
         x = F.relu(x)
-        x = F.max_pool2d(x, kernel_size=2)
         print("MAX POOLING 1 HECHA: ", x.size())
         #Tercera capa conv
         x = self.conv3(x)
         print("CONVOLUCION 3 HECHA: ", x.size())
         x = F.relu(x)
-        x = F.max_pool2d(x, kernel_size=2)
         #Cuarta capa conv
-        x = self.conv4(x)
-        print("CONVOLUCION 4 HECHA: ", x.size())
-        x = F.relu(x)
-        x = F.max_pool2d(x, kernel_size=2)
+        #x = self.conv4(x)
+        #print("CONVOLUCION 4 HECHA: ", x.size())
+        #x = F.relu(x)
         print("MAX POOLING 2 HECHA: ", x.size())
-
-
         #Flatten y primera fully connected
         x = torch.flatten(x, 1) # B, C, H, W
         print("FLATTEN HECHO: ", x.size())
@@ -94,10 +110,8 @@ class Network(nn.Module):
         print("FULLY CONNECTED 1 HECHA: ", x.size())
         #Segunda fully connected
         x = self.fc2(x)
-        x = F.relu(x)
         print("FULLY CONNECTED 2 HECHA: ", x.size())
         #Tercera fully connected y ultima
-        x = self.fc3(x)
         logits = x
         print("FULLY CONNECTED 3 HECHA: ", x.size())
         print("logits: ", logits.size())
@@ -108,7 +122,7 @@ class Network(nn.Module):
     
     def forward_inference(self, x: torch.Tensor) -> torch.Tensor: 
 
-        x = self.conv1(x)
+        """ x = self.conv1(x) #Arquitectura 8
         x = F.relu(x)
         x = self.conv2(x)
         x = F.relu(x)
@@ -126,6 +140,25 @@ class Network(nn.Module):
         x = self.fc2(x)
         x = F.relu(x)
         x = self.fc3(x)
+        logits = x
+        print("logits: ", logits.size())
+        print("logits info: ", logits) """
+
+        x = self.conv1(x) #Arquitectura 7
+        x = F.relu(x)
+        x = self.conv2(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, kernel_size=2)
+        x = self.conv3(x)
+        x = F.relu(x)
+        x = self.conv4(x)
+        x = F.max_pool2d(x, kernel_size=2)
+        x = F.relu(x)
+
+        x = torch.flatten(x) # C, H, W
+        x = self.fc1(x)
+        x = F.relu(x)
+        x = self.fc2(x)
         logits = x
         print("logits: ", logits.size())
         print("logits info: ", logits)

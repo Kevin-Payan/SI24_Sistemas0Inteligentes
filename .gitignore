@@ -10,6 +10,13 @@ src/si24/proyectos/P02_facial_expressions/models/arq6_exp3
 src/si24/proyectos/P02_facial_expressions/models/arq6_exp4
 src/si24/proyectos/P02_facial_expressions/models/arq6_exp5
 src/si24/proyectos/P02_facial_expressions/models/modelo_crack
+proyecto_final_ignorar/dataset
+proyecto_final_ignorar/test_imgs
+proyecto_final_ignorar/models
+proyecto_final_ignorar/
+proyectoFinal/dataset
+proyectoFinal/models
+models
 # C extensions
 *.so
 

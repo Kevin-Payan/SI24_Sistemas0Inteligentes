@@ -9,7 +9,7 @@ import torch.optim as optim
 import torch
 import torch.nn as nn
 from tqdm import tqdm
-from dataset import get_loader
+#from dataset import get_loader
 from network import Network
 from plot_losses import PlotLosses
 
@@ -47,10 +47,10 @@ def validation_step(val_loader, net, cost_function):
 
 def train():
     # Hyperparametros
-    learning_rate = 5e-4 # 1e-4 = 0.0001
+    learning_rate = 10e-4 # 1e-4 = 0.0001
     n_epochs=25
     batch_size = 128
-    modelname = "arq8_exp1"
+    modelname = "arq9_exp1"
 
     # Train, validation, test loaders
     train_dataset, train_loader = \

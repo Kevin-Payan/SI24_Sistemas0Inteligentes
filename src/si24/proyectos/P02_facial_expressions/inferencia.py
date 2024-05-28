@@ -29,7 +29,7 @@ def predict(img_title_paths):
     """
     # Cargar el modelo
     modelo = Network(48, 7)
-    modelo.load_model("arq8_exp1")
+    modelo.load_model("arq7_exp1")
     for path in img_title_paths:
         # Cargar la imagen
         # np.ndarray, torch.Tensor
@@ -98,7 +98,12 @@ if __name__ == "__main__":
         "./test_imgs/neutral_adolfo.png",
         "./test_imgs/neutral_caro.png",
         "./test_imgs/neutral_kevin.png",
-        "./test_imgs/neutral_ord.png"
+        "./test_imgs/neutral_ord.png",
+        "./test_imgs/elbicho_siu.jpeg",
+        "./test_imgs/elbicho_sin_cejas.jpg",
+        "./test_imgs/anda_pasha_bobo.jpeg",
+        "./test_imgs/messi_feliz.jpeg"
+
     ]
 
     predict(img_paths)
