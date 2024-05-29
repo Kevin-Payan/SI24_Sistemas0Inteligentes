@@ -94,11 +94,12 @@ new_model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=
 #Entrenamos
 new_model.fit(x=train_batches, validation_data = val_batches, epochs = 5, verbose = 1)
 
-new_model.save('models/Experimento1') """
+new_model.save('models/Experimento2') """
 
 #Predicciones
 #Primero, cargamos el modelo
-loaded_model = tf.keras.models.load_model(filepath='models/Experimento1')
+loaded_model = tf.keras.models.load_model(filepath='models/Experimento2')
+
 preds = loaded_model.predict(x=test_batches, verbose=1)
 clases = test_batches.classes #Agarramos las clases 
 cm = confusion_matrix(y_true=clases, y_pred=np.argmax(preds, axis=-1))
