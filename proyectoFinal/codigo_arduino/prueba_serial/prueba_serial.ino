@@ -2,7 +2,7 @@
 int ledPinA = 12;  
 int ledPinB = 11;  
 int ledPinC = 10;  
-int ledPinD = 9; 
+int ledPinD = 7; 
 
 void setup() {
   pinMode(ledPinA, OUTPUT);
@@ -55,8 +55,8 @@ void loop() {
     }
 
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(500);                       // wait for a second
+  delay(200);                       // wait for a second
   digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-  delay(500);   
+  delay(200);   
   
 }

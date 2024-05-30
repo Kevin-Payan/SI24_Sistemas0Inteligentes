@@ -4,8 +4,9 @@ import os
 import matplotlib as plt
 import time 
 import mediapipe as mp
-
+import tensorflow as tf
 from tensorflow.python.keras.models import load_model
+from inferencia import serial_prediction
 
 # Model Detection + Drawing
 
@@ -83,6 +84,8 @@ def draw_landmarks(image, results, padding=50):  # padding parameter
 
     return hand_coordinates  # Return a dictionary that points to two other dictionaries containing the coordinates
 
+#Cargar modelo para hacer nuestras predicciones
+model = tf.keras.models.load_model(filepath='models/Experimento1')
 
 cap = cv2.VideoCapture(0)
 # Set mediapipe model 
@@ -103,77 +106,22 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
         # Get & Draw landmarks
         hand_coordinates = draw_landmarks(frame, results)  
 
-        if frame.size > 0:
-            cv2.imwrite('Before.jpg', frame) 
-
         if 'left_hand' in hand_coordinates:
             left_hand_box = hand_coordinates['left_hand']
             cropped_frame_lh = frame_for_saving[left_hand_box['y_min']:left_hand_box['y_max'], left_hand_box['x_min']:left_hand_box['x_max']]
-            # cropped_framelh -> Predict
-        else:
-            cropped_frame_lh = frame_for_saving # ¿Que hacer/enviar cuando no detecta nada?
-            # no predict
+            serial_prediction(cropped_frame_lh,model)
 
         if 'right_hand' in hand_coordinates:
             right_hand_box = hand_coordinates['right_hand']
             cropped_frame_rh = frame_for_saving[right_hand_box['y_min']:right_hand_box['y_max'], right_hand_box['x_min']:right_hand_box['x_max']]
-        else:
-            cropped_frame_rh = frame_for_saving # ¿Que hacer/enviar cuando no detecta nada?
-
-        # cropped_framelh -> Predict
-        # cropped_framerh -> Predict
-
-        # Save the current frame for visualization (borrar esto ya que sirva)
-        #Ya que sirva mandar a prediccion y no guardar, guardar lo hace lento. Guardar solo para visualizar
-        if frame.size > 0:
-            cv2.imwrite('Left_Hand.jpg', cropped_frame_lh)  
-            cv2.imwrite('Right_Hand.jpg', cropped_frame_rh) 
-        else:
-            print("Failed to save.")
-
+            serial_prediction(cropped_frame_rh,model)
+    
         # Show to screen
         cv2.putText(frame, "Press 'q' to end", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.imshow('OpenCV Feed', frame)
         # Check if 'q' is pressed to end hand tracking.
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
     cap.release()
     cv2.destroyAllWindows()
-
-
-
-    """ 
-        # Get results in one single array, if doesnt exist add 0s. 
-        left_hand_nparray = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
-        right_hand_nparray = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
-       
-        #Analizar comportamiento
-        print('Left Hand np array')
-        print(len(left_hand_nparray))
-        print('-------------------')
-        print(left_hand_nparray)
-        print('-------------------')
-
-        print('Right Hand np array')
-        print(len(right_hand_nparray))
-        print('-------------------')
-        print(right_hand_nparray)
-        print('-------------------')
-    """
-
-"""
-    # Check if the left hand data is available
-if 'left_hand' in hand_coordinates:
-    left_hand_box = hand_coordinates['left_hand']
-    print("Left Hand Bounding Box:")
-    print(f"X Min: {left_hand_box['x_min']}")
-    print(f"Y Min: {left_hand_box['y_min']}")
-    print(f"X Max: {left_hand_box['x_max']}")
-    print(f"Y Max: {left_hand_box['y_max']}")
-"""
-
-"""
-# Save the current frame (hand drawing)
-        cv2.imwrite('captured_framee.jpg', frame)  
-        print("Frame saved.")
-"""
