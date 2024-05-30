@@ -98,7 +98,7 @@ new_model.save('models/Experimento2') """
 
 #Predicciones
 #Primero, cargamos el modelo
-loaded_model = tf.keras.models.load_model(filepath='models/Experimento2')
+loaded_model = tf.keras.models.load_model(filepath='models/Experimento1')
 
 preds = loaded_model.predict(x=test_batches, verbose=1)
 clases = test_batches.classes #Agarramos las clases 

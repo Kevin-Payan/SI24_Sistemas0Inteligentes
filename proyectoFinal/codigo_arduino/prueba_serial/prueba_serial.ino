@@ -17,35 +17,35 @@ void loop() {
   if (Serial.available() > 0) {
     char received = Serial.read();  // Lee el carácter recibido
   
-    if (received == 'A') {
+    if (received == '0') {
       digitalWrite(ledPinA, HIGH);
       digitalWrite(ledPinB, LOW);
       digitalWrite(ledPinC, LOW);
       digitalWrite(ledPinD, LOW);
     } 
     
-    if (received == 'B') {
+    if (received == '1') {
       digitalWrite(ledPinA, LOW);
       digitalWrite(ledPinB, HIGH);
       digitalWrite(ledPinC, LOW);
       digitalWrite(ledPinD, LOW);
     }
 
-    if (received == 'C') {
+    if (received == '2') {
       digitalWrite(ledPinA, LOW);
       digitalWrite(ledPinB, LOW);
       digitalWrite(ledPinC, HIGH);
       digitalWrite(ledPinD, LOW);
     }
 
-    if (received == 'D') {
+    if (received == '3') {
       digitalWrite(ledPinA, LOW);
       digitalWrite(ledPinB, LOW);
       digitalWrite(ledPinC, LOW);
       digitalWrite(ledPinD, HIGH);
     }
 
-    if (received == 'F') {
+    if (received == '4') {
       digitalWrite(ledPinA, LOW);
       digitalWrite(ledPinB, LOW);
       digitalWrite(ledPinC, LOW);
