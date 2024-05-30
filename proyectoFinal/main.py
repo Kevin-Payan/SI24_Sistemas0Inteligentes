@@ -3,6 +3,7 @@ import numpy as np
 import os 
 import matplotlib as plt
 import time 
+import serial
 import mediapipe as mp
 import tensorflow as tf
 from tensorflow.python.keras.models import load_model
@@ -87,6 +88,11 @@ def draw_landmarks(image, results, padding=50):  # padding parameter
 #Cargar modelo para hacer nuestras predicciones
 model = tf.keras.models.load_model(filepath='models/Experimento1')
 
+
+# Configura el puerto serial
+ser = serial.Serial('COM10', 9600)
+time.sleep(1)
+
 cap = cv2.VideoCapture(0)
 # Set mediapipe model 
 with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=0.5) as holistic:
@@ -109,12 +115,12 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
         if 'left_hand' in hand_coordinates:
             left_hand_box = hand_coordinates['left_hand']
             cropped_frame_lh = frame_for_saving[left_hand_box['y_min']:left_hand_box['y_max'], left_hand_box['x_min']:left_hand_box['x_max']]
-            serial_prediction(cropped_frame_lh,model)
+            serial_prediction(cropped_frame_lh,model,ser)
 
         if 'right_hand' in hand_coordinates:
             right_hand_box = hand_coordinates['right_hand']
             cropped_frame_rh = frame_for_saving[right_hand_box['y_min']:right_hand_box['y_max'], right_hand_box['x_min']:right_hand_box['x_max']]
-            serial_prediction(cropped_frame_rh,model)
+            serial_prediction(cropped_frame_rh,model,ser)
     
         # Show to screen
         cv2.putText(frame, "Press 'q' to end", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
@@ -125,3 +131,4 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
 
     cap.release()
     cv2.destroyAllWindows()
+    ser.close()
