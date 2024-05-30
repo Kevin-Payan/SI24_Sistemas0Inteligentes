@@ -1,40 +1,20 @@
-"""
 import serial
 import time
 
 # Configura el puerto serial
-ser = serial.Serial('COM9', 9600)  
-
-# Solicitar al usuario que ingrese un carácter
-result = input("Por favor, ingresa (¨A¨ o ¨B¨): ")
-
-if result == 'A':
-    ser.write(b'A')  # Enviar 'A' si el resultado es 'A'
-else:
-    ser.write(b'B')  # Enviar 'B' si el resultado es 'B'
-
-time.sleep(1)  # Espera un poco para enviar el dato
-ser.close()  # Cierra el puerto serial
-"""
-
-
-import serial
-import time
-
-# Configura el puerto serial
-ser = serial.Serial('COM9', 9600)
+ser = serial.Serial('COM10', 9600)
 
 try:
     while True:  # Bucle infinito para solicitar constantemente la entrada del usuario
         # Solicitar al usuario que ingrese un carácter
-        result = input("Por favor, ingresa (A, B, C, D, o F): ")
+        result = input("Por favor, ingresa (0, 1, 2, 3, o 4): ")
 
         # Verificar que el carácter sea uno de los esperados antes de enviar
-        if result in ['A', 'B', 'C', 'D', 'F']:
+        if result in ['0', '1', '2', '3', '4']:
             ser.write(result.encode())  # Enviar el carácter
             print(f"Enviado: {result}")
         else:
-            print("Carácter no válido. Por favor, ingresa A, B, C, D, o F.")
+            print("Carácter no válido. Por favor, ingresa 0, 1, 2, 3, o 4.")
         
         time.sleep(0.5)  # Pequeña pausa para estabilidad
 
