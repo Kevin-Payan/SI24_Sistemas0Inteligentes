@@ -23,9 +23,18 @@ def serial_prediction(image,model,ser):
     confidence = np.max(predictions, axis=1)
     print(f"Confidence in prediction: {confidence}")
 
+    predicted_class = str(predicted_class)
+
     # Send the predicted class index through serial
-    ser.write(f"{predicted_class}\n".encode())
+    # ser.write(f"{predicted_class}\n".encode())
+
+    valid_numbers = ["1" , "2" , "5" , "6" , "11" , "13"]
+
+    if predicted_class in valid_numbers :
+        ser.write(f"{predicted_class}\n".encode())
+        time.sleep(2)
         
+    
 
 
 

@@ -3,12 +3,12 @@ import numpy as np
 from sklearn.metrics import confusion_matrix
 import tensorflow as tf
 from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+from tensorflow.python.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from tensorflow.python.keras.optimizers import adam_v2
 from tensorflow.python.keras.metrics import categorical_crossentropy
 from tensorflow.python.keras.callbacks import ModelCheckpoint
 from keras.layers import BatchNormalization
-from data_prep import train_batches, val_batches, test_batches
+from data_prep import train_batches, val_batches, test_batches, train_batches_original
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import datetime
@@ -84,21 +84,26 @@ for layer in vgg16_model.layers[:-1]:
 
 for layer in new_model.layers:
     layer.trainable = False #Congelar los pesos del new model
-
+new_model.add(Dropout(0.2))
 new_model.add(Dense(units=16, activation='softmax')) #Le añadimos la ultima capa para 16 predicciones
                                                     # Es una fully connected
 
-# Nos preparamos para entrenamiento, definimos optimizer y funcion de costo
-""" optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
+n_layers_to_unfreeze = 4
+
+for layer in new_model.layers[-(n_layers_to_unfreeze+1):]:
+    layer.trainable = True
+
+""" # Nos preparamos para entrenamiento, definimos optimizer y funcion de costo
+optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
 new_model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=["accuracy"])
 #Entrenamos
-new_model.fit(x=train_batches, validation_data = val_batches, epochs = 5, verbose = 1)
+new_model.fit(x=train_batches_original, validation_data = val_batches, epochs = 5, verbose = 1)
 
-new_model.save('models/Experimento2') """
-
+new_model.save('models/Experimento3')
+ """
 #Predicciones
 #Primero, cargamos el modelo
-loaded_model = tf.keras.models.load_model(filepath='models/Experimento1')
+loaded_model = tf.keras.models.load_model(filepath='models/Experimento3')
 
 preds = loaded_model.predict(x=test_batches, verbose=1)
 clases = test_batches.classes #Agarramos las clases 

@@ -86,11 +86,13 @@ def draw_landmarks(image, results, padding=50):  # padding parameter
     return hand_coordinates  # Return a dictionary that points to two other dictionaries containing the coordinates
 
 #Cargar modelo para hacer nuestras predicciones
-model = tf.keras.models.load_model(filepath='models/Experimento1')
+model = tf.keras.models.load_model(filepath='models/Experimento3')
 
+
+contador = 0
 
 # Configura el puerto serial
-ser = serial.Serial('COM10', 9600)
+ser = serial.Serial('COM11', 9600)
 time.sleep(1)
 
 cap = cv2.VideoCapture(0)
@@ -100,6 +102,10 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
         # Read feed
         ret, frame = cap.read()
 
+        contador = contador+1
+
+        print(contador)
+        
         #Selfie View 
         #Since we are changing the view, the setting for the left hand will apear on the right hand on screan and viceversa?
         frame = cv2.flip(frame,1)
@@ -112,16 +118,20 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
         # Get & Draw landmarks
         hand_coordinates = draw_landmarks(frame, results)  
 
-        if 'left_hand' in hand_coordinates:
-            left_hand_box = hand_coordinates['left_hand']
-            cropped_frame_lh = frame_for_saving[left_hand_box['y_min']:left_hand_box['y_max'], left_hand_box['x_min']:left_hand_box['x_max']]
-            serial_prediction(cropped_frame_lh,model,ser)
+        if(contador > 30):
 
-        if 'right_hand' in hand_coordinates:
-            right_hand_box = hand_coordinates['right_hand']
-            cropped_frame_rh = frame_for_saving[right_hand_box['y_min']:right_hand_box['y_max'], right_hand_box['x_min']:right_hand_box['x_max']]
-            serial_prediction(cropped_frame_rh,model,ser)
-    
+            if 'left_hand' in hand_coordinates:
+                left_hand_box = hand_coordinates['left_hand']
+                cropped_frame_lh = frame_for_saving[left_hand_box['y_min']:left_hand_box['y_max'], left_hand_box['x_min']:left_hand_box['x_max']]
+                serial_prediction(cropped_frame_lh,model,ser)
+                contador = 0
+
+            if 'right_hand' in hand_coordinates:
+                right_hand_box = hand_coordinates['right_hand']
+                cropped_frame_rh = frame_for_saving[right_hand_box['y_min']:right_hand_box['y_max'], right_hand_box['x_min']:right_hand_box['x_max']]
+                serial_prediction(cropped_frame_rh,model,ser)
+                contador = 0
+
         # Show to screen
         cv2.putText(frame, "Press 'q' to end", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.imshow('OpenCV Feed', frame)
@@ -132,3 +142,4 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
     cap.release()
     cv2.destroyAllWindows()
     ser.close()
+    
