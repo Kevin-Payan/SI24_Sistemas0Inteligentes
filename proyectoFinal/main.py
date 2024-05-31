@@ -88,11 +88,14 @@ def draw_landmarks(image, results, padding=50):  # padding parameter
 #Cargar modelo para hacer nuestras predicciones
 model = tf.keras.models.load_model(filepath='models/Experimento3')
 
+# Realiza una predicción de prueba para calentar el modelo
+warmup_image = np.zeros((1, 224, 224, 3))  # Una imagen de ceros con las dimensiones esperadas por el modelo
+model.predict(warmup_image)  # Predicción de calentamiento
 
 contador = 0
 
 # Configura el puerto serial
-ser = serial.Serial('COM11', 9600)
+ser = serial.Serial('COM10', 9600)
 time.sleep(1)
 
 cap = cv2.VideoCapture(0)
@@ -142,4 +145,3 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
     cap.release()
     cv2.destroyAllWindows()
     ser.close()
-    

@@ -2,7 +2,7 @@ import serial
 import time
 
 # Configura el puerto serial
-ser = serial.Serial('COM11', 9600)
+ser = serial.Serial('COM10', 9600)
 
 try:
     while True:  # Bucle infinito para solicitar constantemente la entrada del usuario

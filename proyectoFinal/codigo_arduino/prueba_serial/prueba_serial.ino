@@ -3,7 +3,7 @@ int ledPinA = 12;
 int ledPinB = 11;  
 int ledPinC = 10;  
 int ledPinD = 7; 
-
+   
 void setup() {
   pinMode(ledPinA, OUTPUT);
   pinMode(ledPinB, OUTPUT);
@@ -15,37 +15,39 @@ void setup() {
 
 void loop() {
   if (Serial.available() > 0) {
+    
     char received = Serial.read();  // Lee el carácter recibido
+
   
-    if (received == '0') {
+    if (received == '1') {
       digitalWrite(ledPinA, HIGH);
       digitalWrite(ledPinB, LOW);
       digitalWrite(ledPinC, LOW);
       digitalWrite(ledPinD, LOW);
     } 
     
-    if (received == '1') {
+    if (received == '2') {
       digitalWrite(ledPinA, LOW);
       digitalWrite(ledPinB, HIGH);
       digitalWrite(ledPinC, LOW);
       digitalWrite(ledPinD, LOW);
     }
 
-    if (received == '2') {
+    if (received == '5') {
       digitalWrite(ledPinA, LOW);
       digitalWrite(ledPinB, LOW);
       digitalWrite(ledPinC, HIGH);
       digitalWrite(ledPinD, LOW);
     }
 
-    if (received == '3') {
+    if (received == '6') {
       digitalWrite(ledPinA, LOW);
       digitalWrite(ledPinB, LOW);
       digitalWrite(ledPinC, LOW);
       digitalWrite(ledPinD, HIGH);
     }
 
-    if (received == '4') {
+    if (received == '8') {
       digitalWrite(ledPinA, LOW);
       digitalWrite(ledPinB, LOW);
       digitalWrite(ledPinC, LOW);
