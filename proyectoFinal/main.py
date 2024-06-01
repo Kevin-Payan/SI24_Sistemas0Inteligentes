@@ -95,7 +95,7 @@ model.predict(warmup_image)  # Predicción de calentamiento
 contador = 0
 
 # Configura el puerto serial
-ser = serial.Serial('COM10', 9600)
+ser = serial.Serial('COM11', 9600)
 time.sleep(1)
 
 cap = cv2.VideoCapture(0)
@@ -121,7 +121,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=
         # Get & Draw landmarks
         hand_coordinates = draw_landmarks(frame, results)  
 
-        if(contador > 30):
+        if(contador > 60):
 
             if 'left_hand' in hand_coordinates:
                 left_hand_box = hand_coordinates['left_hand']

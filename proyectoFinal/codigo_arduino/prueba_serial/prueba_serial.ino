@@ -19,14 +19,14 @@ void loop() {
     char received = Serial.read();  // Lee el carácter recibido
 
   
-    if (received == '1') {
+    if (received == '111') {
       digitalWrite(ledPinA, HIGH);
       digitalWrite(ledPinB, LOW);
       digitalWrite(ledPinC, LOW);
       digitalWrite(ledPinD, LOW);
     } 
     
-    if (received == '2') {
+    if (received == '212') {
       digitalWrite(ledPinA, LOW);
       digitalWrite(ledPinB, HIGH);
       digitalWrite(ledPinC, LOW);
